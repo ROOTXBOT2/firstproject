@@ -16,8 +16,8 @@ import lombok.ToString;
 public class ArticlesReadOneForm {
     Long articleId;
     String title;
-    String author;
     String content;
+    String author;
 
     public static ArticlesReadOneForm fromEntity(Articles article) {
         return new ArticlesReadOneForm(
@@ -26,5 +26,10 @@ public class ArticlesReadOneForm {
                 article.getContent(),
                 article.getAuthor()
         );
+    }
+    // 게시글 내용 수정용 메서드
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 }

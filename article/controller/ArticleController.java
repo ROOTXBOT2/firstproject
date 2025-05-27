@@ -3,10 +3,11 @@ package com.firstproject.article.controller;
 import com.firstproject.article.dto.ArticlesCreateForm;
 import com.firstproject.article.dto.ArticlesReadForm;
 import com.firstproject.article.dto.ArticlesReadOneForm;
-import com.firstproject.article.entity.Articles;
 import com.firstproject.article.repository.ArticlesRepository;
 import com.firstproject.article.service.ArticleCreate;
+import com.firstproject.article.service.ArticleDelete;
 import com.firstproject.article.service.ArticleRead;
+import com.firstproject.article.service.ArticleUpdate;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ public class ArticleController {
     private final ArticleRead articleRead;
     private final ArticleCreate articleCreate;
     private final ArticlesRepository articlesRepository;
+    private final ArticleUpdate articleUpdate;
+    private final ArticleDelete articleDelete;
 
     @GetMapping("/articles") //게시판 메인 페이지
     public String articles(Model model, HttpSession session) {
@@ -42,7 +45,7 @@ public class ArticleController {
             model.addAttribute("error","로그인을 진행해 주세요.");
             return "redirect:/login";
         }
-
+        model.addAttribute("loggedIn", true);
         model.addAttribute("title", "게시판");
         model.addAttribute("brand", "RUA"); //가져온 세션 정보에서 추출 없으면 메인 페이지로 롤벡
         model.addAttribute("company", "본또보");
@@ -60,17 +63,17 @@ public class ArticleController {
         Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
         // ❌ 로그인하지 않은 경우 → 로그인 페이지로 리다이렉트
         if (loggedIn == null || !loggedIn) {
-            model.addAttribute("title", "LOGIN");
+            model.addAttribute("title", "글작성");
             model.addAttribute("brand", "RUA"); //가져온 세션 정보에서 추출 없으면 메인 페이지로 롤벡
             model.addAttribute("company", "본또보");
             model.addAttribute("error","로그인을 진행해 주세요.");
             return "redirect:/login";
         }
-
+        model.addAttribute("loggedIn", true);
         model.addAttribute("title", "글쓰기");
         model.addAttribute("brand", "RUA"); //가져온 세션 정보에서 추출 없으면 메인 페이지로 롤벡
         model.addAttribute("company", "본또보");
-        return "articles/articlesCreate";
+        return "articles/create";
     }
 
     @PostMapping("/articles/creating") //글을 쓰기위한 데이터 전달 컨트롤러
@@ -107,16 +110,74 @@ public class ArticleController {
             model.addAttribute("error","로그인을 진행해 주세요.");
             return "redirect:/login";
         }
-
+        model.addAttribute("loggedIn", true);
         model.addAttribute("title", "게시글");
         model.addAttribute("brand", "RUA"); //가져온 세션 정보에서 추출 없으면 메인 페이지로 롤벡
         model.addAttribute("company", "본또보");
         Optional<ArticlesReadOneForm> article = articleRead.getArticleById(articleId);
+
         if (article.isPresent()) {
             ArticlesReadOneForm articlesReadOneForm = article.get();
             model.addAttribute("article", articlesReadOneForm);
+            // 작성자와 현재 세션 사용자 비교
+
+            String username = (String) session.getAttribute("username");
+            boolean isAuthor = articlesReadOneForm.getAuthor().equals(username);
+            model.addAttribute("isAuthor", isAuthor);
+
             return "articles/show";
         }
+
         return "articles/error";
+    }
+
+    @GetMapping("/articles/{articleId}/edit")
+    public String edit(@PathVariable Long articleId, Model model, HttpSession session) {
+        Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
+        if (loggedIn == null || !loggedIn) return "redirect:/login";
+
+        model.addAttribute("loggedIn", true);
+        model.addAttribute("title", "글 수정");
+        model.addAttribute("brand", "RUA"); //가져온 세션 정보에서 추출 없으면 메인 페이지로 롤벡
+        model.addAttribute("company", "본또보");
+        Optional<ArticlesReadOneForm> articleOptional = articleRead.getArticleById(articleId);
+        if (articleOptional.isPresent()) {
+            ArticlesReadOneForm article = articleOptional.get();
+
+            String username = (String) session.getAttribute("username");
+            if (!article.getAuthor().equals(username)) return "redirect:/articles";
+
+            model.addAttribute("article", article); // 기존 글 내용 전달
+            return "articles/edit"; // 수정 폼 뷰
+        }
+        return "articles/error";
+    }
+
+    @PostMapping("/articles/{articleId}/edit")
+    public String update(@PathVariable Long articleId,
+                         @ModelAttribute ArticlesCreateForm form,
+                         HttpSession session) {
+        Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
+        if (loggedIn == null || !loggedIn) return "redirect:/login";
+        String username = (String) session.getAttribute("username");
+        articleUpdate.EditArticle(articleId, form.getTitle(), form.getContent(), username);
+        return "redirect:/articles/" + articleId;
+
+    }
+
+    @PostMapping("/articles/{articleId}/delete")
+    public String delete(@PathVariable Long articleId, HttpSession session) {
+        Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
+        if (loggedIn == null || !loggedIn) return "redirect:/login";
+
+        Optional<ArticlesReadOneForm> articleOptional = articleRead.getArticleById(articleId);
+        if (articleOptional.isPresent()) {
+            ArticlesReadOneForm article = articleOptional.get();
+            String username = (String) session.getAttribute("username");
+            if (!article.getAuthor().equals(username)) return "redirect:/articles";
+
+            articleDelete.DeleteArticle(article);
+        }
+        return "redirect:/articles";
     }
 }
