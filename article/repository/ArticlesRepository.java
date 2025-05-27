@@ -1,6 +1,6 @@
-package com.firstproject.auth.repository;
+package com.firstproject.article.repository;
 
-import com.firstproject.auth.entity.Articles;
+import com.firstproject.article.entity.Articles;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

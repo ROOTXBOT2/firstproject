@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
  */
 @Controller
 @RequiredArgsConstructor
-public class LoginController {
+public class LoginOutController {
     private final loginService loginService;
 
     @GetMapping("/login")
@@ -26,6 +26,14 @@ public class LoginController {
         model.addAttribute("company", "본또보");
         model.addAttribute("error","");
         return "auth/login";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        // 현재 로그인 세션 무효화
+        session.invalidate();
+        // 로그인 페이지나 홈으로 리다이렉트
+        return "redirect:/main";
     }
 
     @PostMapping("/join")

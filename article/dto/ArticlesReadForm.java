@@ -1,6 +1,6 @@
-package com.firstproject.auth.dto;
+package com.firstproject.article.dto;
 
-import com.firstproject.auth.entity.Articles;
+import com.firstproject.article.entity.Articles;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,17 +13,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ArticlesReadOneForm {
+public class ArticlesReadForm {
     Long articleId;
     String title;
     String author;
-    String content;
 
-    public static ArticlesReadOneForm fromEntity(Articles article) {
-        return new ArticlesReadOneForm(
+    public static ArticlesReadForm fromEntity(Articles article) {
+        return new ArticlesReadForm(
                 article.getArticleId(),
                 article.getTitle(),
-                article.getContent(),
                 article.getAuthor()
         );
     }

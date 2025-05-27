@@ -1,10 +1,12 @@
-package com.firstproject.auth.controller;
-import com.firstproject.auth.dto.ArticlesCreateForm;
-import com.firstproject.auth.dto.ArticlesReadForm;
-import com.firstproject.auth.entity.Articles;
-import com.firstproject.auth.repository.ArticlesRepository;
-import com.firstproject.auth.service.ArticleCreate;
-import com.firstproject.auth.service.ArticleRead;
+package com.firstproject.article.controller;
+
+import com.firstproject.article.dto.ArticlesCreateForm;
+import com.firstproject.article.dto.ArticlesReadForm;
+import com.firstproject.article.dto.ArticlesReadOneForm;
+import com.firstproject.article.entity.Articles;
+import com.firstproject.article.repository.ArticlesRepository;
+import com.firstproject.article.service.ArticleCreate;
+import com.firstproject.article.service.ArticleRead;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -108,14 +111,12 @@ public class ArticleController {
         model.addAttribute("title", "게시글");
         model.addAttribute("brand", "RUA"); //가져온 세션 정보에서 추출 없으면 메인 페이지로 롤벡
         model.addAttribute("company", "본또보");
-
-        Optional<Articles> articleOptional = articlesRepository.findById(articleId);
-
-        if (articleOptional.isPresent()) {
-            model.addAttribute("article", articleOptional.get());
+        Optional<ArticlesReadOneForm> article = articleRead.getArticleById(articleId);
+        if (article.isPresent()) {
+            ArticlesReadOneForm articlesReadOneForm = article.get();
+            model.addAttribute("article", articlesReadOneForm);
             return "articles/show";
-        } else {
-            return "articles/error";  // 없는 게시글이면 오류 페이지로 이동
         }
+        return "articles/error";
     }
 }

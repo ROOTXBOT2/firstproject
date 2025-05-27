@@ -1,4 +1,4 @@
-package com.firstproject.auth.service;
+package com.firstproject.article.service;
 
 /**
  * @author rua

@@ -1,4 +1,4 @@
-package com.firstproject.auth.dto;
+package com.firstproject.article.dto;
 
 import lombok.Getter;
 import lombok.Setter;
