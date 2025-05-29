@@ -3,7 +3,6 @@ package com.firstproject.article.controller;
 import com.firstproject.article.dto.ArticlesCreateForm;
 import com.firstproject.article.dto.ArticlesReadForm;
 import com.firstproject.article.dto.ArticlesReadOneForm;
-import com.firstproject.article.repository.ArticlesRepository;
 import com.firstproject.article.service.ArticleCreate;
 import com.firstproject.article.service.ArticleDelete;
 import com.firstproject.article.service.ArticleRead;
@@ -11,6 +10,7 @@ import com.firstproject.article.service.ArticleUpdate;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +24,12 @@ import java.util.Optional;
 /**
  * @author rua
  */
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleRead articleRead;
     private final ArticleCreate articleCreate;
-    private final ArticlesRepository articlesRepository;
     private final ArticleUpdate articleUpdate;
     private final ArticleDelete articleDelete;
 
@@ -171,6 +171,7 @@ public class ArticleController {
         if (loggedIn == null || !loggedIn) return "redirect:/login";
 
         Optional<ArticlesReadOneForm> articleOptional = articleRead.getArticleById(articleId);
+
         if (articleOptional.isPresent()) {
             ArticlesReadOneForm article = articleOptional.get();
             String username = (String) session.getAttribute("username");

@@ -1,7 +1,6 @@
 package com.firstproject.article.service;
 
 import com.firstproject.article.dto.ArticlesCreateForm;
-import com.firstproject.article.dto.ArticlesReadOneForm;
 import com.firstproject.article.entity.Articles;
 import com.firstproject.article.repository.ArticlesRepository;
 import lombok.RequiredArgsConstructor;
