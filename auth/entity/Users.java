@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * @author rua
  */
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Users {
     @Id
     @GeneratedValue
@@ -25,6 +28,12 @@ public class Users {
     @Column(unique = true, nullable = false)
     String id;
 
+    @Column(unique = false, nullable = false, length = 20)
+    String nickname;
+
     @Column(unique = false, nullable = false)
     String password;
+
+    @Column
+    LocalDateTime createdAt = LocalDateTime.now();; //가입 시각
 }

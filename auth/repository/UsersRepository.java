@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author rua
  */
 @Repository
-public interface UserRepository extends CrudRepository<Users, Long> {
+public interface UsersRepository extends CrudRepository<Users, Long> {
     Optional<Users> findById(String id); // id: 로그인용 ID
     boolean existsById(String id);      // 중복 체크용
 }

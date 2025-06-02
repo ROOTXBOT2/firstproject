@@ -1,12 +1,10 @@
 package com.firstproject.article.controller;
 
+import com.firstproject.article.dto.ArticleCommentReadForm;
 import com.firstproject.article.dto.ArticlesCreateForm;
 import com.firstproject.article.dto.ArticlesReadForm;
 import com.firstproject.article.dto.ArticlesReadOneForm;
-import com.firstproject.article.service.ArticleCreate;
-import com.firstproject.article.service.ArticleDelete;
-import com.firstproject.article.service.ArticleRead;
-import com.firstproject.article.service.ArticleUpdate;
+import com.firstproject.article.service.*;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +25,12 @@ import java.util.Optional;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-public class ArticleController {
+public class  ArticleController {
     private final ArticleRead articleRead;
     private final ArticleCreate articleCreate;
     private final ArticleUpdate articleUpdate;
     private final ArticleDelete articleDelete;
+    private final ArticleCommentService articleCommentService;
 
     @GetMapping("/articles") //게시판 메인 페이지
     public String articles(Model model, HttpSession session) {
@@ -124,7 +123,9 @@ public class ArticleController {
             String username = (String) session.getAttribute("username");
             boolean isAuthor = articlesReadOneForm.getAuthor().equals(username);
             model.addAttribute("isAuthor", isAuthor);
-
+            // 댓글 목록 추가
+            List<ArticleCommentReadForm> comments = articleCommentService.getComments(articleId);
+            model.addAttribute("comments", comments);
             return "articles/show";
         }
 
