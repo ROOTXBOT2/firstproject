@@ -16,7 +16,7 @@ public class WebConfig {
                         // 프런트엔드가 띄워진 주소를 정확하게 적어 줌
                         .allowedOrigins("http://192.168.0.5:3000")
                         // 필요한 경우 더 추가 가능 (예: .allowedOrigins("http://localhost:3000", "http://192.168.0.5:3000"))
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("GET", "POST", "DELETE", "PATCH")
                         .allowCredentials(true);
             }
         };

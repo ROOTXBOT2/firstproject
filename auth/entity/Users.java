@@ -1,9 +1,6 @@
 package com.firstproject.auth.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +31,13 @@ public class Users {
     @Column(unique = false, nullable = false)
     String password;
 
-    @Column
-    LocalDateTime createdAt = LocalDateTime.now();; //가입 시각
+    // 생성 시 자동으로 시간 설정
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    // 엔티티 생성 직전에 시간 설정
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

@@ -13,16 +13,16 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ArticlesReadForm {
+public class ArticlesReadAllResponse {
     Long articleId;
     String title;
     String author;
 
-    public static ArticlesReadForm fromEntity(Articles article) {
-        return new ArticlesReadForm(
+    public static ArticlesReadAllResponse fromEntity(Articles article) {
+        return new ArticlesReadAllResponse(
                 article.getArticleId(),
                 article.getTitle(),
-                article.getAuthor()
+                article.getUser().getNickname()
         );
     }
 }

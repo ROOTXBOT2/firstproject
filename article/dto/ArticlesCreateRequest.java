@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ArticlesCreateForm {
+public class ArticlesCreateRequest {
     private String title;
     private String content;
 }

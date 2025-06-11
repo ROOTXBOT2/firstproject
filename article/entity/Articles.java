@@ -1,9 +1,7 @@
 package com.firstproject.article.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.firstproject.auth.entity.Users;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,8 +24,9 @@ public class Articles {
     @Column(nullable = false)
     String content;
 
-    @Column(nullable = false)
-    String author;
+    @ManyToOne(optional = false)  // N : 1 관계 (다수의 Article → 하나의 User)
+    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
+    private Users user;
 
     public void update(String title, String content) {
         this.title = title;

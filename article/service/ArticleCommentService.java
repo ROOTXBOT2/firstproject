@@ -1,18 +1,19 @@
 package com.firstproject.article.service;
 
-import com.firstproject.article.dto.ArticleCommentCreateForm;
-import com.firstproject.article.dto.ArticleCommentReadForm;
-import com.firstproject.article.entity.ArticleComment;
+import com.firstproject.article.dto.ArticleCommentCreateRequest;
+import com.firstproject.article.dto.ArticleCommentResponse;
 import com.firstproject.article.entity.Articles;
-import com.firstproject.article.repository.ArticleCommentRepository;
+import com.firstproject.article.entity.Comment;
 import com.firstproject.article.repository.ArticlesRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.firstproject.article.repository.CommentsRepository;
+import com.firstproject.auth.entity.Users;
+import com.firstproject.auth.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author rua
@@ -20,32 +21,50 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ArticleCommentService {
-    private final ArticleCommentRepository commentRepository;
+    private final CommentsRepository commentsRepository;
     private final ArticlesRepository articlesRepository;
+    private final UsersRepository usersRepository;
 
     @Transactional(readOnly = true)
-    public List<ArticleCommentReadForm> getComments(Long articleId) {
-        // 게시글이 없는 경우 404 처리
-        if (!articlesRepository.existsById(articleId)) {
-            throw new EntityNotFoundException("게시글을 찾을 수 없습니다. id=" + articleId);
-        }
-        return commentRepository.findAllByArticle_ArticleIdOrderByCreatedAtAsc(articleId);
-    }
-
-    @Transactional
-    public Long addComment(Long articleId, ArticleCommentCreateForm form, String author) {
+    public List<ArticleCommentResponse> getAllComment(Long articleId) {
+        // 게시글 존재 여부 확인
         Articles article = articlesRepository.findById(articleId)
-                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다. id=" + articleId));
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        ArticleComment comment = ArticleComment.of(article, form.getContent(), author);
-        return commentRepository.save(comment).getCommentId();
+        // 해당 게시글의 모든 댓글 조회
+        List<Comment> comments = commentsRepository.findAllByArticle(article);
+
+        // Comment 엔티티를 ArticleCommentResponse DTO로 변환
+        return comments.stream()
+                .map(comment -> new ArticleCommentResponse(
+                        comment.getCommentId(),
+                        comment.getComment(),
+                        comment.getAuthor()
+                ))
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void deleteComment(Long commentId, String author) {
-        //ArticleComment comment = commentRepository.findByCommentIdAndAuthor(commentId, author);
+    public void createComment(Long articleId, ArticleCommentCreateRequest form, Long userId) {
+        // 게시글 존재 여부 확인
+        Articles article = articlesRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        commentRepository.findAllByArticle_ArticleIdOrderByCreatedAtAsc(commentId);
-        //commentRepository.delete(comment);
+        // 사용자 존재 여부 확인
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new SecurityException("유효하지 않은 사용자입니다."));
+
+//        // 댓글 생성 시 null 방지를 위한 검증 추가
+//        if (form.getComment() == null || form.getComment().trim().isEmpty()) {
+//            throw new IllegalArgumentException("댓글 내용은 필수입니다.");
+//        }
+
+        // 댓글 생성
+        Comment comment = Comment.builder()
+                .article(article)
+                .comment(form.getComment()) // 공백 제거
+                .author(user.getNickname())
+                .build();
+        commentsRepository.save(comment);
     }
 }

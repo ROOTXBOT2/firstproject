@@ -17,6 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UsersRepository usersRepository;
 
+    public boolean idCheck(String id){
+        return usersRepository.existsById(id);
+    }
+
     @Transactional
     public boolean register(SignupRequestDto form) {
         Users user = Users.builder()

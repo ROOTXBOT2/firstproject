@@ -1,7 +1,10 @@
 package com.firstproject.article.dto;
 
 import com.firstproject.article.entity.Articles;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author rua
@@ -10,24 +13,20 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ArticlesReadOneForm {
+public class ArticlesReadOneResponse {
     Long articleId;
     String title;
     String content;
     String author;
-    @Setter
-    boolean isAuthor;
 
-    public static ArticlesReadOneForm fromEntity(Articles article) {
-        return new ArticlesReadOneForm(
+    public static ArticlesReadOneResponse fromEntity(Articles article) {
+        return new ArticlesReadOneResponse(
                 article.getArticleId(),
                 article.getTitle(),
                 article.getContent(),
-                article.getAuthor(),
-                false
+                article.getUser().getNickname()
         );
     }
-
     // 게시글 내용 수정용 메서드
     public void update(String title, String content) {
         this.title = title;
